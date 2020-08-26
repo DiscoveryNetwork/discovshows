@@ -1,0 +1,17 @@
+main: nl.parrotlync.discovshows.DiscovShows
+name: DiscovShows
+version: 1.1
+description: Show plugin for the Discovery Network
+api-version: 1.12
+author: ParrotLync
+commands:
+  show:
+    description: Main DiscovShows command
+    usage: /show
+permissions:
+  discovshows.operate:
+    default: op
+    description: Permission to operate shows
+  discovshows.schedule:
+    default: op
+    description: Permission to schedule shows

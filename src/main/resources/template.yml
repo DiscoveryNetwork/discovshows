@@ -1,0 +1,9 @@
+name: Template
+schedule: "12:00"
+steps:
+  0:
+    - say Test
+    - say Test2
+  4:
+    - say Test3
+    - say Test4
