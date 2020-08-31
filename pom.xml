@@ -5,7 +5,7 @@
 
     <groupId>nl.parrotlync</groupId>
     <artifactId>DiscovShows</artifactId>
-    <version>1.12.2-v1.1</version>
+    <version>1.12.2-v1.2.1</version>
 
     <build>
         <plugins>

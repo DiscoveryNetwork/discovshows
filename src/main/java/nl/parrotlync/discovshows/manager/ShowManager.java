@@ -3,13 +3,8 @@ package nl.parrotlync.discovshows.manager;
 import nl.parrotlync.discovshows.DiscovShows;
 import nl.parrotlync.discovshows.model.Show;
 import nl.parrotlync.discovshows.util.StorageUtil;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 public class ShowManager {
@@ -43,7 +38,7 @@ public class ShowManager {
         File directory = new File("plugins/DiscovShows/");
         for (String fileName : Objects.requireNonNull(directory.list())) {
             String filePath = path + fileName;
-            Show show = new Show(StorageUtil.getName(filePath), StorageUtil.getSchedule(filePath), StorageUtil.getSteps(filePath), filePath);
+            Show show = new Show(StorageUtil.getName(filePath), StorageUtil.getSchedule(filePath), StorageUtil.getSteps(filePath), StorageUtil.getRepeat(filePath), StorageUtil.getCommands(filePath) ,filePath);
             shows.put(show.getName().toLowerCase(), show);
         }
         DiscovShows.getInstance().getLogger().info("Loaded " + shows.size() + " shows.");

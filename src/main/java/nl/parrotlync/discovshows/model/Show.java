@@ -14,13 +14,17 @@ public class Show {
     private String name;
     private Date schedule;
     private BukkitTask task;
+    private Boolean repeat;
     private String filePath;
+    private HashMap<Integer, String> preCommands;
     private HashMap<Integer, List<String>> steps;
 
-    public Show(String name, Date schedule, HashMap<Integer, List<String>> steps, String filePath) {
+    public Show(String name, Date schedule, HashMap<Integer, List<String>> steps, Boolean repeat, HashMap<Integer, String> preCommands, String filePath) {
         this.name = name;
         this.schedule = schedule;
         this.steps = steps;
+        this.repeat = repeat;
+        this.preCommands = preCommands;
         this.filePath = filePath;
     }
 
@@ -42,12 +46,21 @@ public class Show {
         return schedule;
     }
 
+    public Boolean getRepeat() {
+        return repeat;
+    }
+
     public BukkitTask getTask() {
         return task;
     }
 
+    public String getPreCommand(Integer minutes) {
+        return preCommands.get(minutes);
+    }
+
     public void start() {
         reload();
+        stop();
         task = new ShowRunner(this).runTaskTimer(DiscovShows.getInstance(), 0L, 1L);
     }
 
@@ -57,9 +70,11 @@ public class Show {
         }
     }
 
-    public void reload() {
+    private void reload() {
         name = StorageUtil.getName(filePath);
         schedule = StorageUtil.getSchedule(filePath);
         steps = StorageUtil.getSteps(filePath);
+        repeat = StorageUtil.getRepeat(filePath);
+        preCommands = StorageUtil.getCommands(filePath);
     }
 }

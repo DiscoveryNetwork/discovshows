@@ -1,0 +1,20 @@
+name: Template # Name of the show
+schedule: "12:00" # Show runs every day at this time
+repeat: false # Should the show repeat when started? (Until manual stop)
+pre-10-cmd: "say 10 Minutes to show!" # Command to run 10 minute before show starts
+pre-5-cmd: "say 5 Minutes to show!" # Command to run 5 minute before show starts
+pre-1-cmd: "say 1 Minute to show!" # Command to run 1 minute before show starts
+steps:
+  0: # Offset from start in ticks
+    - say Test # Command 1
+    - say Test2 # Command 2 (Add as many commands as you'd like)
+  4:
+    - say Test3
+    - say Test4
+
+
+
+# There are several options that can be disabled by removing them:
+# schedule, repeat, pre-10-message, pre-5-message, pre-1-message
+
+# The options name and steps are necessary to let the plugin function

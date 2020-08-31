@@ -29,10 +29,15 @@ public class StorageUtil {
         return config.getString("name");
     }
 
+    public static Boolean getRepeat(String path) {
+        YamlConfiguration config = getConfig(path);
+        return config.getBoolean("repeat");
+    }
+
     public static Date getSchedule(String path) {
         YamlConfiguration config = getConfig(path);
         String schedule = config.getString("schedule");
-        if (schedule != null && !schedule.equals("0")) {
+        if (schedule != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
             try {
                 return formatter.parse(schedule);
@@ -41,6 +46,15 @@ public class StorageUtil {
             }
         }
         return null;
+    }
+
+    public static HashMap<Integer, String> getCommands(String path) {
+        YamlConfiguration config = getConfig(path);
+        HashMap<Integer, String> commands = new HashMap<>();
+        commands.put(10, config.getString("pre-10-cmd"));
+        commands.put(5, config.getString("pre-5-cmd"));
+        commands.put(1, config.getString("pre-1-cmd"));
+        return commands;
     }
 
     public static HashMap<Integer, List<String>> getSteps(String path) {
