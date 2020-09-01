@@ -1,5 +1,17 @@
 package nl.parrotlync.discovshows.command;
 
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.registry.WorldData;
 import nl.parrotlync.discovshows.DiscovShows;
 import nl.parrotlync.discovshows.model.Fountain;
 import nl.parrotlync.discovshows.model.Show;
@@ -15,6 +27,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.StringUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +40,7 @@ public class ShowCommandExecutor implements TabExecutor {
 
         if (sender.hasPermission("discovshows.operate")) {
             if (args.length == 0) {
-                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v1.2.1 §7- Use /show help", true);
+                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v1.2.2 §7- Use /show help", true);
                 return true;
             }
 
@@ -81,6 +95,32 @@ public class ShowCommandExecutor implements TabExecutor {
                     return true;
                 }
             }
+
+            if (args[0].equalsIgnoreCase("paste") && args.length == 6) {
+                File file = new File("plugins/WorldEdit/schematics/" + args[1] + ".schematic");
+
+                if (!file.exists()) { return false; }
+
+                ClipboardFormat format = ClipboardFormat.findByFile(file);
+                if (format != null) {
+                    try {
+                        World world = new BukkitWorld(Bukkit.getWorld(args[2]));
+                        WorldData data = world.getWorldData();
+                        ClipboardReader reader = format.getReader(new FileInputStream(file));
+                        Clipboard clipboard = reader.read(data);
+                        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+                        Operation operation = new ClipboardHolder(clipboard, data)
+                                .createPaste(editSession, data)
+                                .to(BlockVector.toBlockPoint(Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5])))
+                                .build();
+                        Operations.complete(operation);
+                        return true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
         }
 
         return help(sender);
@@ -99,10 +139,8 @@ public class ShowCommandExecutor implements TabExecutor {
         }
 
         if (args.length == 2) {
-            if (args[1].equalsIgnoreCase("start") || args[1].equalsIgnoreCase("stop")) {
-                for (Show show : DiscovShows.getInstance().getShowManager().getShows()) {
-                    suggestions.add(show.getName());
-                }
+            if (args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop")) {
+                suggestions.addAll(DiscovShows.getInstance().getShowManager().getIdentifiers());
                 return StringUtil.copyPartialMatches(args[1], suggestions, new ArrayList<String>());
             }
         }
@@ -119,6 +157,7 @@ public class ShowCommandExecutor implements TabExecutor {
             ChatUtil.sendMessage(sender, "§3/show reload §7Reload all show & config files", false);
             if (sender.hasPermission("discovshows.effects")) {
                 //ChatUtil.sendMessage(sender, "§3/show effect fountain <x> <y> <z> <dx> <dy> <dz> <blockId> <blockData> <runTime> <world> §7Spawn a fountain", false);
+                ChatUtil.sendMessage(sender, "§3/show paste <schematic> <world> <x> <y> <z> §7Paste a WorldEdit schematic at a specific location", false);
             }
         } else {
             ChatUtil.sendMessage(sender, "§cYou do not have permission to do that!", true);
