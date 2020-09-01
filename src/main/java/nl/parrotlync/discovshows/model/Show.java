@@ -16,10 +16,10 @@ public class Show {
     private BukkitTask task;
     private Boolean repeat;
     private String filePath;
-    private HashMap<Integer, String> preCommands;
+    private HashMap<Integer, List<String>> preCommands;
     private HashMap<Integer, List<String>> steps;
 
-    public Show(String name, Date schedule, HashMap<Integer, List<String>> steps, Boolean repeat, HashMap<Integer, String> preCommands, String filePath) {
+    public Show(String name, Date schedule, HashMap<Integer, List<String>> steps, Boolean repeat, HashMap<Integer, List<String>> preCommands, String filePath) {
         this.name = name;
         this.schedule = schedule;
         this.steps = steps;
@@ -54,7 +54,7 @@ public class Show {
         return task;
     }
 
-    public String getPreCommand(Integer minutes) {
+    public List<String> getPreCommands(Integer minutes) {
         return preCommands.get(minutes);
     }
 

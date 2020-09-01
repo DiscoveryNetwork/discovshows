@@ -27,20 +27,26 @@ public class ShowChecker extends BukkitRunnable {
         for (Show show : shows) {
             if (show.getSchedule() != null) {
                 if (formatter.format(DateUtils.addMinutes(currentTime, 10)).equals(formatter.format(show.getSchedule().getTime()))) {
-                    if (show.getPreCommand(10) != null) {
-                        Bukkit.dispatchCommand(sender, show.getPreCommand(10));
+                    if (show.getPreCommands(10) != null) {
+                        for (String cmd : show.getPreCommands(10)) {
+                            Bukkit.dispatchCommand(sender, cmd);
+                        }
                     }
                 }
 
                 else if (formatter.format(DateUtils.addMinutes(currentTime, 5)).equals(formatter.format(show.getSchedule().getTime()))) {
-                    if (show.getPreCommand(5) != null) {
-                        Bukkit.dispatchCommand(sender, show.getPreCommand(5));
+                    if (show.getPreCommands(5) != null) {
+                        for (String cmd : show.getPreCommands(5)) {
+                            Bukkit.dispatchCommand(sender, cmd);
+                        }
                     }
                 }
 
                 else if (formatter.format(DateUtils.addMinutes(currentTime, 1)).equals(formatter.format(show.getSchedule().getTime()))) {
-                    if (show.getPreCommand(1) != null) {
-                        Bukkit.dispatchCommand(sender, show.getPreCommand(1));
+                    if (show.getPreCommands(1) != null) {
+                        for (String cmd : show.getPreCommands(1)) {
+                            Bukkit.dispatchCommand(sender, cmd);
+                        }
                     }
                 }
 

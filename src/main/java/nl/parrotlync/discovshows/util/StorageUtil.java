@@ -48,12 +48,12 @@ public class StorageUtil {
         return null;
     }
 
-    public static HashMap<Integer, String> getCommands(String path) {
+    public static HashMap<Integer, List<String>> getCommands(String path) {
         YamlConfiguration config = getConfig(path);
-        HashMap<Integer, String> commands = new HashMap<>();
-        commands.put(10, config.getString("pre-10-cmd"));
-        commands.put(5, config.getString("pre-5-cmd"));
-        commands.put(1, config.getString("pre-1-cmd"));
+        HashMap<Integer, List<String>> commands = new HashMap<>();
+        commands.put(10, config.getStringList("pre-10-cmd"));
+        commands.put(5, config.getStringList("pre-5-cmd"));
+        commands.put(1, config.getStringList("pre-1-cmd"));
         return commands;
     }
 
