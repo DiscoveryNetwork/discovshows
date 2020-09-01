@@ -1,6 +1,6 @@
 main: nl.parrotlync.discovshows.DiscovShows
 name: DiscovShows
-version: 1.2.1
+version: 1.2.2
 description: Show plugin for the Discovery Network
 api-version: 1.12
 author: ParrotLync

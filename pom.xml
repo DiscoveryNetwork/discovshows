@@ -5,7 +5,7 @@
 
     <groupId>nl.parrotlync</groupId>
     <artifactId>DiscovShows</artifactId>
-    <version>1.12.2-v1.2.1</version>
+    <version>1.12.2-v1.2.2</version>
 
     <build>
         <plugins>
@@ -25,6 +25,10 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>enginehub-maven</id>
+            <url>http://maven.enginehub.org/repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -33,6 +37,16 @@
             <artifactId>spigot-api</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.1.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
