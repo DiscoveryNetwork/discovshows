@@ -40,7 +40,7 @@ public class ShowCommandExecutor implements TabExecutor {
 
         if (sender.hasPermission("discovshows.operate")) {
             if (args.length == 0) {
-                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v1.2.2 §7- Use /show help", true);
+                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v1.2.2 §7(§aParrotLync§7) - Use /show help", false);
                 return true;
             }
 
@@ -99,7 +99,10 @@ public class ShowCommandExecutor implements TabExecutor {
             if (args[0].equalsIgnoreCase("paste") && args.length == 6) {
                 File file = new File("plugins/WorldEdit/schematics/" + args[1] + ".schematic");
 
-                if (!file.exists()) { return false; }
+                if (!file.exists()) {
+                    ChatUtil.sendMessage(sender, "§cFile not found!", true);
+                    return true;
+                }
 
                 ClipboardFormat format = ClipboardFormat.findByFile(file);
                 if (format != null) {
