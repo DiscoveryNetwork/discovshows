@@ -1,12 +1,18 @@
 name: Template # Name of the show
-schedule: "12:00" # Show runs every day at this time
 repeat: false # Should the show repeat when started? (Until manual stop)
-pre-10-cmd: # Commands to run 10 minutes before show starts
-  - "say 10 Minutes to show!"
-pre-5-cmd:
-  - "say 5 Minutes to show!"
-pre-1-cmd:
-  - "say 1 Minute to show!"
+commands:
+  pre-10: # Commands to execute 10 minutes before the show
+    - say 10 Minutes to show!
+  pre-5: # Commands to execute 5 minutes before the show
+    - say 5 Minutes to show!
+  pre-1: # Commands to execute 1 minute before the show
+    - say 1 Minute to show!
+  after: # Commands to execute if the show is stopped or has ended
+    - say The show has ended!
+schedule: # Schedule the show on different days of the week, remove the day
+  tuesday: "13:00"
+  once: # One-time scheduling
+    - "3-9-2020 13:00"
 steps:
   0: # Offset from start in ticks
     - say Test # Command 1
@@ -16,8 +22,7 @@ steps:
     - say Test4
 
 
-
 # There are several options that can be disabled by removing them:
-# schedule, repeat, pre-10-cmd, pre-5-cmd, pre-1-cmd
+# repeat, commands, commands.pre-10, commands.pre-5, commands.pre-1, commands.after, schedule, schedule.weekday, schedule.once
 
 # The options name and steps are necessary to let the plugin function

@@ -1,17 +1,21 @@
 package nl.parrotlync.discovshows.util;
 
-import nl.parrotlync.discovshows.model.Show;
+import nl.parrotlync.discovshows.DiscovShows;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class StorageUtil {
+    private static SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm");
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    private static HashMap<String, List<Date>> customScheduled = new HashMap<>();
 
     private static YamlConfiguration getConfig(String path) {
         File file = new File(path);
@@ -34,27 +38,20 @@ public class StorageUtil {
         return config.getBoolean("repeat");
     }
 
-    public static Date getSchedule(String path) {
-        YamlConfiguration config = getConfig(path);
-        String schedule = config.getString("schedule");
-        if (schedule != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-            try {
-                return formatter.parse(schedule);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
     public static HashMap<Integer, List<String>> getCommands(String path) {
         YamlConfiguration config = getConfig(path);
-        HashMap<Integer, List<String>> commands = new HashMap<>();
-        commands.put(10, config.getStringList("pre-10-cmd"));
-        commands.put(5, config.getStringList("pre-5-cmd"));
-        commands.put(1, config.getStringList("pre-1-cmd"));
-        return commands;
+        HashMap<Integer, List<String>> commandMap = new HashMap<>();
+        ConfigurationSection commands = config.getConfigurationSection("commands");
+        if (commands != null) {
+            for (String preCmd : commands.getKeys(false)) {
+                if (preCmd.equalsIgnoreCase("after")) {
+                    commandMap.put(0, commands.getStringList("after"));
+                    continue;
+                }
+                commandMap.put(Integer.parseInt(preCmd.split("-")[1]), commands.getStringList(preCmd));
+            }
+        }
+        return commandMap;
     }
 
     public static HashMap<Integer, List<String>> getSteps(String path) {
@@ -66,4 +63,58 @@ public class StorageUtil {
         }
         return steps;
     }
+
+    public static List<Date> getSchedules(String path) {
+        YamlConfiguration config = getConfig(path);
+        List<Date> showDates = new ArrayList<>();
+        ConfigurationSection schedules = config.getConfigurationSection("schedule");
+        if (schedules != null) {
+            for (String schedule : schedules.getKeys(false)) {
+                if (schedule.equals("once")) { continue; }
+                try {
+                    for (String time : schedules.getStringList(schedule)) {
+                        Date date = weekFormatter.parse(schedule + " " + time);
+                        showDates.add(date);
+                    }
+                } catch (ParseException e) {
+                    DiscovShows.getInstance().getLogger().info("Something went wrong while parsing schedules for file '" + path + "'");
+                }
+            }
+        }
+        return showDates;
+    }
+
+    public static List<Date> getCustomSchedules(String path) {
+        YamlConfiguration config = getConfig(path);
+        List<Date> showDates = new ArrayList<>();
+        if (customScheduled.get(path) != null) {
+            showDates.addAll(customScheduled.get(path));
+        }
+        ConfigurationSection schedules = config.getConfigurationSection("schedule");
+        if (schedules != null) {
+            if (schedules.getStringList("once") != null) {
+                for (String schedule : schedules.getStringList("once")) {
+                    try {
+                        Date date = dateFormatter.parse(schedule);
+                        showDates.add(date);
+                    } catch (ParseException e) {
+                        DiscovShows.getInstance().getLogger().info("Something went wrong while parsing custom schedules for file '" + path + "'");
+                    }
+                }
+            }
+        }
+        return showDates;
+    }
+
+    public static void addCustomSchedule(Date date, String path) {
+        if (customScheduled.get(path) == null) {
+            customScheduled.put(path, new ArrayList<Date>());
+        }
+        customScheduled.get(path).add(date);
+    }
+
+    public static void clearCustomSchedule() {
+        customScheduled.clear();
+    }
+
 }

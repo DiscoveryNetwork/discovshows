@@ -15,7 +15,7 @@ public class ShowRunner extends BukkitRunnable {
     private Integer ticks = 0;
     private Integer lastTick;
 
-    public ShowRunner(Show show) {
+    public ShowRunner(Show show, Integer ticks) {
         this.show = show;
         this.sender = Bukkit.getServer().getConsoleSender();
         List<Integer> steps = show.getSteps();
@@ -37,6 +37,11 @@ public class ShowRunner extends BukkitRunnable {
             } else {
                 this.cancel();
                 DiscovShows.getInstance().getLogger().info("Show has finished (" + show.getName() + ")");
+                if (show.getCommands(0) != null) {
+                    for (String cmd : show.getCommands(0)) {
+                        Bukkit.dispatchCommand(sender, cmd);
+                    }
+                }
             }
         }
         ticks += 1;

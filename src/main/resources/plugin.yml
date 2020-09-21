@@ -1,8 +1,9 @@
 main: nl.parrotlync.discovshows.DiscovShows
 name: DiscovShows
-version: 1.2.2
+version: 1.3.3
 description: Show plugin for the Discovery Network
 api-version: 1.12
+depend: [WorldEdit]
 author: ParrotLync
 commands:
   show:
@@ -12,9 +13,6 @@ permissions:
   discovshows.operate:
     default: op
     description: Permission to operate shows
-  discovshows.schedule:
-    default: op
-    description: Permission to schedule shows
   discovshows.effects:
     default: op
     description: Permission to use effects

@@ -7,6 +7,7 @@ import nl.parrotlync.discovshows.task.ShowChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 
 public class DiscovShows extends JavaPlugin {
     private ShowManager showManager;
@@ -28,7 +29,6 @@ public class DiscovShows extends JavaPlugin {
         }
         getServer().getPluginManager().registerEvents(new ShowListener(), this);
         this.getCommand("show").setExecutor(new ShowCommandExecutor());
-        new ShowChecker().runTaskTimerAsynchronously(this, 0, 1200);
         getLogger().info("DiscovShows is now enabled!");
     }
 

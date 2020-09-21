@@ -26,23 +26,27 @@ public class ShowListener implements Listener {
                 Player player = (Player) event.getWhoClicked();
                 if (item.getData().toString().equals("STAINED_CLAY(14)")) {
                     player.closeInventory();
-                    Show show = DiscovShows.getInstance().getShowManager().getShow(meta.getDisplayName().replace("§7", ""));
-                    show.start();
-                    ChatUtil.sendMessage(player, "§7Started the show §a" + show.getName(), true);
+                    Show show = DiscovShows.getInstance().getShowManager().getShow(meta.getLore().get(1));
+                    player.performCommand("show start " + show.getIdentifier());
                 } else if (item.getData().toString().equals("STAINED_CLAY(13)")) {
                     player.closeInventory();
-                    Show show = DiscovShows.getInstance().getShowManager().getShow(meta.getDisplayName().replace("§7", ""));
-                    show.stop();
-                    ChatUtil.sendMessage(player, "§7Stopped the show §c" + show.getName(), true);
+                    Show show = DiscovShows.getInstance().getShowManager().getShow(meta.getLore().get(1));
+                    player.performCommand("show stop " + show.getIdentifier());
                 }
             }
+        }
+        if (inventory.getTitle().equals("Schedule list")) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryDragEvent event) {
+    public void onInventoryDrag(InventoryDragEvent event) {
         Inventory inventory = event.getInventory();
         if (inventory.getTitle().equals("DiscovShows List")) {
+            event.setCancelled(true);
+        }
+        if (inventory.getTitle().equals("Schedule list")) {
             event.setCancelled(true);
         }
     }
