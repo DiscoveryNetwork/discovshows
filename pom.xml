@@ -5,7 +5,11 @@
 
     <groupId>nl.parrotlync</groupId>
     <artifactId>DiscovShows</artifactId>
-    <version>1.12.2-v1.3.3</version>
+    <version>1.12.2-v1.4${revision}</version>
+
+    <properties>
+        <revision>-SNAPSHOT</revision>
+    </properties>
 
     <build>
         <plugins>
@@ -20,14 +24,17 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>https://maven.ipictserver.nl/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
-            <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>enginehub-maven</id>
-            <url>http://maven.enginehub.org/repo/</url>
+            <id>nexus-releases</id>
+            <url>https://maven.ipictserver.nl/repository/maven-group/</url>
         </repository>
     </repositories>
 
@@ -41,12 +48,22 @@
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>6.1.4-SNAPSHOT</version>
+            <version>6.1.5</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-core</artifactId>
             <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.qveshn</groupId>
+            <artifactId>LightAPI-fork</artifactId>
+            <version>3.4.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>nl.parrotlync</groupId>
+            <artifactId>DiscordAPI</artifactId>
+            <version>1.12.2-v1.0.1</version>
         </dependency>
     </dependencies>
 

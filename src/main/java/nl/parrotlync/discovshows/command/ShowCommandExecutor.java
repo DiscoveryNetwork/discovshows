@@ -19,6 +19,7 @@ import nl.parrotlync.discovshows.util.ChatUtil;
 import nl.parrotlync.discovshows.util.StorageUtil;
 import org.apache.commons.lang.time.DateUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,6 +29,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.StringUtil;
+import org.bukkit.util.Vector;
+import ru.beykerykt.lightapi.LightAPI;
+import ru.beykerykt.lightapi.LightType;
+import ru.beykerykt.lightapi.chunks.ChunkInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,22 +54,9 @@ public class ShowCommandExecutor implements TabExecutor {
                 return help(sender);
             }
 
-            if (args[0].equalsIgnoreCase("forcestart")) {
-                if (DiscovShows.getInstance().getShowManager().getShow(args[1]) != null) {
-                    Integer ticks =  (args.length == 3) ? (args[2].equals("0")) ? 0 : Integer.parseInt(args[2]) : 0;
-                    Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
-                    if (show.start(ticks)) {
-                        ChatUtil.sendMessage(sender, "§7Started the show §a" + show.getName(), true);
-                    } else {
-                        ChatUtil.sendMessage(sender, "§cShow is already running!", true);
-                    }
-                    return true;
-                }
-            }
-
             if (args[0].equalsIgnoreCase("start") && args.length == 2) {
-                if (DiscovShows.getInstance().getShowManager().getShow(args[1]) != null) {
-                    Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                if (show != null) {
                     if (canStart(show)) {
                         if (show.scheduleNow()) {
                             ChatUtil.sendMessage(sender, "§7The show §a" + show.getName() + " §7should be starting soon.", true);
@@ -74,15 +66,75 @@ public class ShowCommandExecutor implements TabExecutor {
                     } else {
                         ChatUtil.sendMessage(sender, "§cThat show can't be started right now!", true);
                     }
+                }
+                else {
+                    ChatUtil.sendMessage(sender, "§cThat show doesn't exist!", true);
+                }
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("stop") && args.length == 2) {
+                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                if (show != null) {
+                    show.stop();
+                    ChatUtil.sendMessage(sender, "§7Stopped the show §c" + show.getName(), true);
                     return true;
                 }
             }
 
-            if (args[0].equalsIgnoreCase("stop") && args.length == 2) {
-                if (DiscovShows.getInstance().getShowManager().getShow(args[1]) != null) {
-                    Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
-                    show.stop();
-                    ChatUtil.sendMessage(sender, "§7Stopped the show §c" + show.getName(), true);
+            if (args[0].equalsIgnoreCase("list")) {
+                Player player = (Player) sender;
+                double size = (Math.floor((double) DiscovShows.getInstance().getShowManager().getShows().size() / 9) + 1) * 9;
+                Inventory inventory = Bukkit.createInventory(null, (int) size, "DiscovShows List");
+                for (Show show : DiscovShows.getInstance().getShowManager().getShows()) {
+                    inventory.addItem(createShowGuiItem(show));
+                }
+                player.openInventory(inventory);
+                return true;
+            }
+        }
+
+        if (sender.hasPermission("discovshows.developer")) {
+            if (args[0].equalsIgnoreCase("forcestart")) {
+                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                if (show != null) {
+                    Integer ticks =  (args.length == 3) ? (args[2].equals("0")) ? 0 : Integer.parseInt(args[2]) : 0;
+                    if (show.start(ticks)) {
+                        ChatUtil.sendMessage(sender, "§7Started the show §a" + show.getName(), true);
+                    } else {
+                        ChatUtil.sendMessage(sender, "§cShow is already running!", true);
+                    }
+                } else {
+                    ChatUtil.sendMessage(sender, "§cThat show doesn't exist!", true);
+                }
+                return true;
+            }
+
+            if (args[0].equalsIgnoreCase("debug") && args.length == 2) {
+                Player player = (Player) sender;
+                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                if (show != null) {
+                    show.togglePlayerBossBar(player);
+                    return true;
+                }
+                return false;
+            }
+
+            if (args[0].equalsIgnoreCase("schedules") && args.length == 2) {
+                Player player = (Player) sender;
+                SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm z");
+                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
+                if (show != null) {
+                    double size = StorageUtil.getSchedules(show.getFilePath()).size() + StorageUtil.getCustomSchedules(show.getFilePath()).size();
+                    size = (Math.floor(size / 9) + 1) * 9;
+                    Inventory inventory = Bukkit.createInventory(null,  (int) size, "Schedule list");
+                    for (Date date : StorageUtil.getSchedules(show.getFilePath())) {
+                        inventory.addItem(createScheduleGuiItem(weekFormatter.format(date), (byte) 11));
+                    }
+                    for (Date date : StorageUtil.getCustomSchedules(show.getFilePath())) {
+                        inventory.addItem(createScheduleGuiItem(date.toString(), (byte) 4));
+                    }
+                    player.openInventory(inventory);
                     return true;
                 }
             }
@@ -98,41 +150,16 @@ public class ShowCommandExecutor implements TabExecutor {
                     return false;
                 }
             }
-
-            if (args[0].equalsIgnoreCase("list")) {
-                Player player = (Player) sender;
-                Inventory inventory = Bukkit.createInventory(null, 27, "DiscovShows List");
-                for (Show show : DiscovShows.getInstance().getShowManager().getShows()) {
-                    inventory.addItem(createShowGuiItem(show));
-                }
-                player.openInventory(inventory);
-                return true;
-            }
-
-            if (args[0].equalsIgnoreCase("schedules") && args.length == 2) {
-                Player player = (Player) sender;
-                SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm z");
-                Show show = DiscovShows.getInstance().getShowManager().getShow(args[1]);
-                if (show != null) {
-                    Inventory inventory = Bukkit.createInventory(null,  27, "Schedule list");
-                    for (Date date : StorageUtil.getSchedules(show.getFilePath())) {
-                        inventory.addItem(createScheduleGuiItem(weekFormatter.format(date), (byte) 11));
-                    }
-                    for (Date date : StorageUtil.getCustomSchedules(show.getFilePath())) {
-                        inventory.addItem(createScheduleGuiItem(date.toString(), (byte) 4));
-                    }
-                    player.openInventory(inventory);
-                    return true;
-                }
-            }
         }
 
         if (sender.hasPermission("discovshows.effects")) {
-            if (args[0].equalsIgnoreCase("effect")) {
-                if (args[1].equalsIgnoreCase("fountain")) {
-                    new Fountain(args);
-                    return true;
-                }
+            if (args[0].equalsIgnoreCase("fountain") && args.length == 9) {
+                Location location = new Location(Bukkit.getWorld(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+                Vector motion = new Vector(Float.parseFloat(args[5]), Float.parseFloat(args[6]), Float.parseFloat(args[7]));
+                Integer runTime = Integer.parseInt(args[8]);
+                Fountain fountain = new Fountain(location, motion, runTime);
+                fountain.run();
+                return true;
             }
 
             if (args[0].equalsIgnoreCase("paste") && args.length == 6) {
@@ -164,6 +191,24 @@ public class ShowCommandExecutor implements TabExecutor {
                 }
                 return false;
             }
+
+            if (args[0].equalsIgnoreCase("light")) {
+                if (args[1].equalsIgnoreCase("create") && args.length == 7) {
+                    Location location = new Location(Bukkit.getWorld(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
+                    LightAPI.createLight(location, LightType.BLOCK, Integer.parseInt(args[6]), false);
+                    updateLightChunks(location, Integer.parseInt(args[6]));
+                    ChatUtil.sendMessage(sender, "§7Created a new light source in §6" + args[2] + " §7at §b" + args[3] + " " + args[4] + " " + args[5], true);
+                    return true;
+                }
+
+                if (args[1].equalsIgnoreCase("remove") && args.length == 6) {
+                    Location location = new Location(Bukkit.getWorld(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
+                    LightAPI.deleteLight(location, LightType.BLOCK, false);
+                    updateLightChunks(location, 15);
+                    ChatUtil.sendMessage(sender, "§7Removed a light source in §6" + args[2] + " §7at §b" + args[3] + " " + args[4] + " " + args[5], true);
+                    return true;
+                }
+            }
         }
 
         return help(sender);
@@ -184,7 +229,7 @@ public class ShowCommandExecutor implements TabExecutor {
         }
 
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("forcestart") || args[0].equalsIgnoreCase("schedules")) {
+            if (args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop") || args[0].equalsIgnoreCase("forcestart") || args[0].equalsIgnoreCase("schedules") || args[0].equalsIgnoreCase("debug")) {
                 suggestions.addAll(DiscovShows.getInstance().getShowManager().getIdentifiers());
                 return StringUtil.copyPartialMatches(args[1], suggestions, new ArrayList<String>());
             }
@@ -199,11 +244,17 @@ public class ShowCommandExecutor implements TabExecutor {
             ChatUtil.sendMessage(sender, "§3/show start <name> §7Start a show", false);
             ChatUtil.sendMessage(sender, "§3/show stop <name> §7Stop a show", false);
             ChatUtil.sendMessage(sender, "§3/show list §7List all shows", false);
-            ChatUtil.sendMessage(sender, "§3/show schedules <show> §7Get an overview of all show schedules", false);
-            ChatUtil.sendMessage(sender, "§3/show reload §7Reload all show & config files", false);
+            if (sender.hasPermission("discovshows.developer")) {
+                ChatUtil.sendMessage(sender, "§3/show forcestart <show> [ticks] §7Toggle debug mode for a show", false);
+                ChatUtil.sendMessage(sender, "§3/show debug <show> §7Toggle debug mode for a show", false);
+                ChatUtil.sendMessage(sender, "§3/show schedules <show> §7Get an overview of all show schedules", false);
+                ChatUtil.sendMessage(sender, "§3/show reload §7Reload all show & config files", false);
+            }
             if (sender.hasPermission("discovshows.effects")) {
-                //ChatUtil.sendMessage(sender, "§3/show effect fountain <x> <y> <z> <dx> <dy> <dz> <blockId> <blockData> <runTime> <world> §7Spawn a fountain", false);
+                ChatUtil.sendMessage(sender, "§3/show fountain <world> <x> <y> <z> <dx> <dy> <dz> <runTime> §7Spawn a falling block fountain", false);
                 ChatUtil.sendMessage(sender, "§3/show paste <schematic> <world> <x> <y> <z> §7Paste a WorldEdit schematic at a specific location", false);
+                ChatUtil.sendMessage(sender, "§3/show light create <world> <x> <y> <z> <level> §7Create an invisible light source", false);
+                ChatUtil.sendMessage(sender, "§3/show light remove <world> <x> <y> <z> §7Create an invisible light source", false);
             }
         } else {
             ChatUtil.sendMessage(sender, "§cYou do not have permission to do that!", true);
@@ -216,24 +267,25 @@ public class ShowCommandExecutor implements TabExecutor {
         if (StorageUtil.getCustomSchedules(show.getFilePath()).isEmpty() && StorageUtil.getSchedules(show.getFilePath()).isEmpty()) { return true; }
         try {
             boolean start = true;
-            SimpleDateFormat tFormatter = new SimpleDateFormat("HH:mm:ss");
-            List<Date> dates = StorageUtil.getSchedules(show.getFilePath());
-            dates.addAll(StorageUtil.getCustomSchedules(show.getFilePath()));
-            Date now = tFormatter.parse(tFormatter.format(new Date()));
-            if (show.getCommandKeys() != null) {
-                int max = Collections.max(show.getCommandKeys());
-                int showTime = show.getDuration() + 1;
-                for (Date date : dates) {
-                    if (DateUtils.addSeconds(now, max + showTime).compareTo(tFormatter.parse(tFormatter.format(date))) >= 0 && now.compareTo(tFormatter.parse(tFormatter.format(DateUtils.addSeconds(date, showTime)))) <= 0) {
-                        start = false;
-                    }
+            SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm:ss");
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            int showTime = show.getDuration() + Collections.max(show.getCommandKeys());
+            Date weekNow = weekFormatter.parse(weekFormatter.format(new Date()));
+            for (Date date : StorageUtil.getSchedules(show.getFilePath())) {
+                if (DateUtils.addSeconds(weekNow, showTime).compareTo(date) >= 0 && weekNow.compareTo(DateUtils.addSeconds(date, showTime)) <= 0) {
+                    start = false;
                 }
-                return start;
             }
+            Date dateNow = dateFormatter.parse(dateFormatter.format(new Date()));
+            for (Date date : StorageUtil.getCustomSchedules(show.getFilePath())) {
+                if (DateUtils.addSeconds(dateNow, showTime).compareTo(date) >= 0 && dateNow.compareTo(DateUtils.addSeconds(date, showTime)) <= 0) {
+                    start = false;
+                }
+            }
+            return start;
         } catch (Exception e) {
             return false;
         }
-        return false;
     }
 
     private ItemStack createShowGuiItem(Show show) {
@@ -270,5 +322,11 @@ public class ShowCommandExecutor implements TabExecutor {
         }
         item.setItemMeta(meta);
         return item;
+    }
+
+    public void updateLightChunks(Location location, Integer lightLevel) {
+        for (ChunkInfo chunkInfo : LightAPI.collectChunks(location, LightType.BLOCK, lightLevel)) {
+            LightAPI.updateChunk(chunkInfo, LightType.BLOCK);
+        }
     }
 }

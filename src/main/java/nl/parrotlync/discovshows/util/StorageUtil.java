@@ -2,9 +2,11 @@ package nl.parrotlync.discovshows.util;
 
 import nl.parrotlync.discovshows.DiscovShows;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,9 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class StorageUtil {
-    private static SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm");
-    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-    private static HashMap<String, List<Date>> customScheduled = new HashMap<>();
+    private static final SimpleDateFormat weekFormatter = new SimpleDateFormat("EEEE HH:mm");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    private static final HashMap<String, List<Date>> customScheduled = new HashMap<>();
 
     private static YamlConfiguration getConfig(String path) {
         File file = new File(path);
@@ -28,6 +30,21 @@ public class StorageUtil {
         return config;
     }
 
+    public static boolean checkConfig(String path) {
+        File file = new File(path);
+        if (!file.isFile()) { return false; }
+        YamlConfiguration config = new YamlConfiguration();
+        try {
+            config.load(file);
+            return true;
+        } catch (Exception e) {
+            DiscovShows.getInstance().getLogger().info("Error while loading show file at " + path);
+            DiscovShows.getInstance().getLogger().info("Please check this file for YAML errors");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static String getName(String path) {
         YamlConfiguration config = getConfig(path);
         return config.getString("name");
@@ -36,6 +53,16 @@ public class StorageUtil {
     public static Boolean getRepeat(String path) {
         YamlConfiguration config = getConfig(path);
         return config.getBoolean("repeat");
+    }
+
+    public static Boolean getDiscordEnabled(String path) {
+        YamlConfiguration config = getConfig(path);
+        return config.getBoolean("discord.enabled");
+    }
+
+    public static String getDiscordMessage(String path) {
+        YamlConfiguration config = getConfig(path);
+        return config.getString("discord.message");
     }
 
     public static HashMap<Integer, List<String>> getCommands(String path) {

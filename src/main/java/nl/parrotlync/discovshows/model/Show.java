@@ -5,7 +5,11 @@ import nl.parrotlync.discovshows.task.ShowRunner;
 import nl.parrotlync.discovshows.util.StorageUtil;
 import org.apache.commons.lang.time.DateUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.text.ParseException;
@@ -16,18 +20,24 @@ public class Show {
     private String name;
     private BukkitTask task;
     private Boolean repeat;
-    private String filePath;
-    private String identifier;
+    private Boolean discordEnabled;
+    private String discordMessage;
+    private final String filePath;
+    private final String identifier;
+    private final BossBar bossBar;
     private HashMap<Integer, List<String>> commands;
     private HashMap<Integer, List<String>> steps;
 
-    public Show(String name, HashMap<Integer, List<String>> steps, Boolean repeat, HashMap<Integer, List<String>> commands, String filePath, String identifier) {
+    public Show(String name, HashMap<Integer, List<String>> steps, Boolean repeat, HashMap<Integer, List<String>> commands, String filePath, String identifier, Boolean discordEnabled, String discordMessage) {
         this.name = name;
         this.steps = steps;
         this.repeat = repeat;
         this.commands = commands;
         this.filePath = filePath;
         this.identifier = identifier;
+        this.discordEnabled = discordEnabled;
+        this.discordMessage = discordMessage;
+        this.bossBar = Bukkit.createBossBar("§3§l" + name + "§7: §cIdle", BarColor.RED, BarStyle.SOLID);
     }
 
     public List<String> getStepCommands(Integer offset) {
@@ -73,6 +83,36 @@ public class Show {
         return task != null && !task.isCancelled();
     }
 
+    public boolean hasDiscordBroadcastEnabled() {
+        return discordEnabled;
+    }
+
+    public String getDiscordMessage() { return discordMessage; }
+
+    public void updateBossBar(Integer ticks) {
+        if (bossBar.getPlayers().size() != 0) {
+            if (isRunning()) {
+                bossBar.setColor(BarColor.GREEN);
+                if (Collections.max(steps.keySet()) != 0) {
+                    bossBar.setProgress(Double.valueOf(ticks) / Collections.max(steps.keySet()));
+                }
+                bossBar.setTitle("§3§l" + name + "§7: §aRunning §7- §6" + ticks + " §7ticks");
+            } else {
+                bossBar.setColor(BarColor.RED);
+                bossBar.setTitle("§3§l" + name + "§7: §cIdle");
+                bossBar.setProgress(1);
+            }
+        }
+    }
+
+    public void togglePlayerBossBar(Player player) {
+        if (bossBar.getPlayers().contains(player)) {
+            bossBar.removePlayer(player);
+        } else {
+            bossBar.addPlayer(player);
+        }
+    }
+
     public boolean start(Integer ticks) {
         if (!isRunning()) {
             reload();
@@ -112,12 +152,15 @@ public class Show {
                 }
             }
         }
+        updateBossBar(0);
     }
 
     private void reload() {
         name = StorageUtil.getName(filePath);
         steps = StorageUtil.getSteps(filePath);
         repeat = StorageUtil.getRepeat(filePath);
+        discordEnabled = StorageUtil.getDiscordEnabled(filePath);
+        discordMessage = StorageUtil.getDiscordMessage(filePath);
         commands = StorageUtil.getCommands(filePath);
     }
 }

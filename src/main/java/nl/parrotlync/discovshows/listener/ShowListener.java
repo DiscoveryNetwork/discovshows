@@ -2,11 +2,12 @@ package nl.parrotlync.discovshows.listener;
 
 import nl.parrotlync.discovshows.DiscovShows;
 import nl.parrotlync.discovshows.model.Show;
-import nl.parrotlync.discovshows.util.ChatUtil;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -48,6 +49,15 @@ public class ShowListener implements Listener {
         }
         if (inventory.getTitle().equals("Schedule list")) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.getEntityType() == EntityType.FALLING_BLOCK) {
+            if (event.getEntity().getMetadata("Type").get(0) != null && event.getEntity().getMetadata("Type").get(0).asString().equals("Fountain")) {
+                event.setCancelled(true);
+            }
         }
     }
 }

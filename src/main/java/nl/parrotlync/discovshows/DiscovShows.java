@@ -22,6 +22,7 @@ public class DiscovShows extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         try {
             showManager.load();
         } catch (Exception e) {

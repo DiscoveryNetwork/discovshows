@@ -10,13 +10,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class ShowRunner extends BukkitRunnable {
-    private Show show;
-    private ConsoleCommandSender sender;
-    private Integer ticks = 0;
-    private Integer lastTick;
+    private final Show show;
+    private final ConsoleCommandSender sender;
+    private Integer ticks;
+    private final Integer lastTick;
 
     public ShowRunner(Show show, Integer ticks) {
         this.show = show;
+        this.ticks = ticks;
         this.sender = Bukkit.getServer().getConsoleSender();
         List<Integer> steps = show.getSteps();
         Collections.sort(steps);
@@ -26,6 +27,7 @@ public class ShowRunner extends BukkitRunnable {
 
     @Override
     public void run() {
+        show.updateBossBar(ticks);
         if (show.getStepCommands(ticks) != null) {
             for (String cmd : show.getStepCommands(ticks)) {
                 Bukkit.dispatchCommand(sender, cmd);
@@ -42,6 +44,7 @@ public class ShowRunner extends BukkitRunnable {
                         Bukkit.dispatchCommand(sender, cmd);
                     }
                 }
+                show.updateBossBar(0);
             }
         }
         ticks += 1;

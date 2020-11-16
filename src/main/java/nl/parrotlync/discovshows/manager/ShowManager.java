@@ -10,8 +10,8 @@ import java.io.File;
 import java.util.*;
 
 public class ShowManager {
-    private HashMap<String, Show> shows = new HashMap<>();
-    private String path = "plugins/DiscovShows/";
+    private final HashMap<String, Show> shows = new HashMap<>();
+    private final String path = "plugins/DiscovShows/shows/";
     private BukkitTask showChecker;
 
     public List<Show> getShows() {
@@ -42,9 +42,13 @@ public class ShowManager {
         stopChecker();
         File directory = new File(path);
         for (String fileName : Objects.requireNonNull(directory.list())) {
-                String filePath = path + fileName;
-                Show show = new Show(StorageUtil.getName(filePath), StorageUtil.getSteps(filePath), StorageUtil.getRepeat(filePath), StorageUtil.getCommands(filePath) ,filePath, fileName.replace(".yml", ""));
+            String filePath = path + fileName;
+            if (StorageUtil.checkConfig(filePath)) {
+                Show show = new Show(StorageUtil.getName(filePath), StorageUtil.getSteps(filePath), StorageUtil.getRepeat(filePath),
+                        StorageUtil.getCommands(filePath) ,filePath, fileName.replace(".yml", ""),
+                        StorageUtil.getDiscordEnabled(filePath), StorageUtil.getDiscordMessage(filePath));
                 addShow(show.getIdentifier(), show);
+            }
         }
         DiscovShows.getInstance().getLogger().info("Loaded " + shows.size() + " shows.");
         startChecker();
