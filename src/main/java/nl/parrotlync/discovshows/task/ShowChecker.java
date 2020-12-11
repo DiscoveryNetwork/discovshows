@@ -55,16 +55,18 @@ public class ShowChecker extends BukkitRunnable {
         Date currentTime = tFormatter.parse(tFormatter.format(now));
         Date checkTime = tFormatter.parse(tFormatter.format(date));
 
-        if (show.hasDiscordBroadcastEnabled() && type == ScheduleType.SCHEDULED) {
-            if (DateUtils.addSeconds(currentTime, 1200).compareTo(checkTime) == 0) {
-                String channel = DiscovShows.getInstance().getConfig().getString("staff-channel");
-                DiscordAPI.sendEmbed("Discovery Network - Shows", "The show **" + show.getName() + "** is starting in 20 minutes! \nAnnouncements can be made in <#" + DiscovShows.getInstance().getConfig().getString("event-channel") + ">.", 0x61C244, channel);
-            }
+        if (DiscovShows.getInstance().isDiscordEnabled()) {
+            if (show.hasDiscordBroadcastEnabled() && type == ScheduleType.SCHEDULED) {
+                if (DateUtils.addSeconds(currentTime, 1200).compareTo(checkTime) == 0) {
+                    String channel = DiscovShows.getInstance().getConfig().getString("staff-channel");
+                    DiscordAPI.sendEmbed("Discovery Network - Shows", "The show **" + show.getName() + "** is starting in 20 minutes! \nAnnouncements can be made in <#" + DiscovShows.getInstance().getConfig().getString("event-channel") + ">.", 0x61C244, channel);
+                }
 
-            if (DateUtils.addSeconds(currentTime, 600).compareTo(checkTime) == 0) {
-                if (show.getDiscordMessage() != null) {
-                    String channel = DiscovShows.getInstance().getConfig().getString("event-channel");
-                    DiscordAPI.sendMessageWithCheck(show.getDiscordMessage(), channel, 600);
+                if (DateUtils.addSeconds(currentTime, 600).compareTo(checkTime) == 0) {
+                    if (show.getDiscordMessage() != null) {
+                        String channel = DiscovShows.getInstance().getConfig().getString("event-channel");
+                        DiscordAPI.sendMessageWithCheck(show.getDiscordMessage(), channel, 600);
+                    }
                 }
             }
         }

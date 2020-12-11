@@ -10,7 +10,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class DiscovShows extends JavaPlugin {
-    private ShowManager showManager;
+    private final ShowManager showManager;
+    private boolean discordEnabled = false;
     private static DiscovShows instance;
 
     public DiscovShows() {
@@ -28,6 +29,12 @@ public class DiscovShows extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (getServer().getPluginManager().getPlugin("DiscordAPI") != null) {
+            discordEnabled = true;
+            getLogger().info("DiscordAPI was found. Enabling messages are enabled.");
+        } else {
+            getLogger().info("DiscordAPI was not found. Discord messages are disabled.");
+        }
         getServer().getPluginManager().registerEvents(new ShowListener(), this);
         this.getCommand("show").setExecutor(new ShowCommandExecutor());
         getLogger().info("DiscovShows is now enabled!");
@@ -41,4 +48,8 @@ public class DiscovShows extends JavaPlugin {
     public static DiscovShows getInstance() { return instance; }
 
     public ShowManager getShowManager() { return showManager; }
+
+    public boolean isDiscordEnabled() {
+        return discordEnabled;
+    }
 }

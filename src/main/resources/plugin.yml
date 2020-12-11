@@ -3,7 +3,8 @@ name: DiscovShows
 version: 1.4
 description: Show plugin for the Discovery Network
 api-version: 1.12
-depend: [WorldEdit, LightAPI, DiscordAPI]
+depend: [WorldEdit, LightAPI]
+softdepend: [DiscordAPI]
 author: ParrotLync
 commands:
   show:
