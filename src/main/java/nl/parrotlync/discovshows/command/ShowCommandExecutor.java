@@ -46,7 +46,7 @@ public class ShowCommandExecutor implements TabExecutor {
 
         if (sender.hasPermission("discovshows.operate")) {
             if (args.length == 0) {
-                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v1.3.3 §7(§aParrotLync§7) - Use /show help", false);
+                ChatUtil.sendMessage(sender, "§6DiscovShows-1.12.2-v" + DiscovShows.getInstance().getDescription().getVersion() +" §7(§aParrotLync§7) - Use /show help", false);
                 return true;
             }
 
