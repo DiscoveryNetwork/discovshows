@@ -1,0 +1,29 @@
+main: nl.parrotlync.discovshows.DiscovShows
+name: ${parent.artifactId}
+version: ${version}
+description: ${description}
+softdepend: [LightAPI, WorldEdit]
+author: ParrotLync
+commands:
+  show:
+    usage: /show help
+    description: Main DiscovShows Command
+permissions:
+  discovshows.command.start:
+    default: op
+    description: Permission to use the start sub-command
+  discovshows.command.stop:
+    default: op
+    description: Permission to use the stop sub-command
+  discovshows.command.list:
+    default: op
+    description: Permission to use the list sub-command
+  discovshows.command.forcestart:
+    default: op
+    description: Permission to use the forcestart sub-command
+  discovshows.command.reload:
+    default: op
+    description: Permission to use the reload sub-command
+  discovshows.command.light:
+    default: op
+    description: Permission to use the light sub-command
