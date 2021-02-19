@@ -27,10 +27,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Maven build
-      run: mvn -B --batch-mode -Drevision=.$GITHUB_RUN_NUMBER clean package
+      run: mvn -B --batch-mode -Drevision=2.0.$GITHUB_RUN_NUMBER clean package
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.2
       with:
         path: plugin/target/*.jar
     - name: Maven deploy
-      run: mvn --batch-mode -Drevision=.$GITHUB_RUN_NUMBER deploy
+      run: mvn --batch-mode -Drevision=2.0.$GITHUB_RUN_NUMBER deploy
