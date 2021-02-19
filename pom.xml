@@ -60,11 +60,6 @@
             <artifactId>LightAPI-fork</artifactId>
             <version>3.4.5-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>nl.parrotlync</groupId>
-            <artifactId>DiscordAPI</artifactId>
-            <version>1.12.2-v1.0.1</version>
-        </dependency>
     </dependencies>
 
 </project>
