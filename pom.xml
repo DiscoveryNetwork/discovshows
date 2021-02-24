@@ -12,6 +12,7 @@
 
     <properties>
         <revision>2.0-SNAPSHOT</revision>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <modules>
@@ -32,6 +33,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>https://nexus.ipictserver.nl/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>

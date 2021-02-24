@@ -55,13 +55,6 @@
         </resources>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <url>https://nexus.ipictserver.nl/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.github.qveshn</groupId>
