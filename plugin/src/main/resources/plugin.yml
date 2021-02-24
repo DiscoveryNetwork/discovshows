@@ -1,5 +1,5 @@
 main: nl.parrotlync.discovshows.DiscovShows
-name: ${parent.artifactId}
+name: ${artifactId}
 version: ${version}
 description: ${description}
 softdepend: [LightAPI, WorldEdit]

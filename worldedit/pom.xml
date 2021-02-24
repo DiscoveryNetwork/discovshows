@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>nl.parrotlync</groupId>
-        <artifactId>DiscovShows</artifactId>
+        <artifactId>DiscovShows-main</artifactId>
         <version>${revision}</version>
     </parent>
 

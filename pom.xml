@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.parrotlync</groupId>
-    <artifactId>DiscovShows</artifactId>
+    <artifactId>DiscovShows-main</artifactId>
     <version>${revision}</version>
     <description>Show plugin for Discovery Network. Supports scheduling and various effects.</description>
     <packaging>pom</packaging>
@@ -32,13 +32,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <url>https://nexus.ipictserver.nl/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>
