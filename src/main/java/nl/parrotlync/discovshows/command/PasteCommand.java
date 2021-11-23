@@ -1,9 +1,10 @@
 package nl.parrotlync.discovshows.command;
 
+import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
@@ -68,17 +69,23 @@ public class PasteCommand extends ShowCommand {
     }
 
     private void pasteSchematic(Location location, File file) throws IOException, WorldEditException {
-        com.sk89q.worldedit.world.World world = new BukkitWorld(location.getWorld());
+        Clipboard clipboard;
+
         ClipboardFormat format = ClipboardFormats.findByFile(file);
         assert format != null;
+        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+            clipboard = reader.read();
+        }
 
-        ClipboardReader reader = format.getReader(new FileInputStream(file));
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
-        Operation operation = new ClipboardHolder(reader.read())
-                .createPaste(editSession)
-                .to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
-                .ignoreAirBlocks(true)
-                .build();
-        Operations.complete(operation);
+        assert location.getWorld() != null;
+        com.sk89q.worldedit.world.World world = FaweAPI.getWorld(location.getWorld().getName());
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
+            Operation operation = new ClipboardHolder(clipboard)
+                    .createPaste(editSession)
+                    .to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
+                    .ignoreAirBlocks(true)
+                    .build();
+            Operations.complete(operation);
+        }
     }
 }

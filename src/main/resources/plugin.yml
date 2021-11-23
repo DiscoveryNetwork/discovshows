@@ -1,9 +1,9 @@
 main: nl.parrotlync.discovshows.DiscovShows
-name: ${artifactId}
+name: DiscovShows
 version: ${version}
 description: ${description}
 api-version: 1.15
-softdepend: [LightAPI, WorldEdit]
+softdepend: [LightAPI, FastAsyncWorldEdit]
 author: ParrotLync
 commands:
   show:
